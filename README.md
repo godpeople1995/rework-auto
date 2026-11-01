@@ -1,4 +1,4 @@
-# KV HOSTLINK (Python) — KEYENCE KV Host Link
+# Rework Auto (Python) — KEYENCE KV Host Link
 
 Giao tiếp PLC KEYENCE dòng KV qua Host Link (Upper Link) bằng Python.
 
