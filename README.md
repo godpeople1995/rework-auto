@@ -73,6 +73,8 @@ Tạo ra:
 - `zf_analysis.png` — 6 biểu đồ: chuỗi thời gian trước/sau, góc quay, tương quan góc–trước, góc–sau, chênh lệch, phân bố
 - `zf_angle_summary.csv` — bảng trung bình theo từng góc quay
 
+Đơn vị: 2 cột thời gian tính bằng **giây (s)**, góc quay tính bằng **độ (°)**.
+
 Tham số:
 
 - `--host` IP PLC

@@ -58,9 +58,9 @@ async def read_zf_values(args: argparse.Namespace) -> int:
         return 1
 
     columns = (
-        "Thoi gian truoc khi chinh",
+        "Thoi gian truoc khi chinh (s)",
         "Goc quay",
-        "Thoi gian sau khi chinh",
+        "Thoi gian sau khi chinh (s)",
     )
     print(f"\n{columns[0]:>10} | {columns[1]:>10} | {columns[2]:>10}")
     print("-" * 38)

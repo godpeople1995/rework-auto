@@ -54,7 +54,7 @@ def main() -> int:
 
     fig, axes = plt.subplots(2, 3, figsize=(17, 9))
     fig.suptitle(
-        "Phân tích góc quay và thời gian trước / sau khi chỉnh (ZF10000–ZF16000, kiểu S-int16)",
+        "Phân tích góc quay và thời gian trước / sau khi chỉnh (ZF10000–ZF16000, thời gian: giây)",
         fontsize=14,
         fontweight="bold",
     )
@@ -70,7 +70,7 @@ def main() -> int:
         ax.plot(idx, np.convolve(after, kernel, mode="same"), color="#e8710a", lw=2)
     ax.set_title("Thời gian trước và sau khi chỉnh theo thứ tự đọc")
     ax.set_xlabel("Mẫu")
-    ax.set_ylabel("Giá trị (int16)")
+    ax.set_ylabel("Thời gian (s)")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8)
 
@@ -90,7 +90,7 @@ def main() -> int:
             label=f"y = {a_before:.4f}x + {b_before:.1f}\nr = {r_before:.3f}, R² = {r_before**2:.3f}")
     ax.set_title("Trước khi chỉnh: phụ thuộc mạnh vào góc")
     ax.set_xlabel("Góc quay")
-    ax.set_ylabel("Thời gian trước khi chỉnh")
+    ax.set_ylabel("Thời gian trước khi chỉnh (s)")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8, loc="upper left")
 
@@ -101,7 +101,7 @@ def main() -> int:
                label=f"Trung bình = {after.mean():.1f}\nr = {r_after:.3f}, R² = {r_after**2:.3f}")
     ax.set_title("Sau khi chỉnh: gần như không phụ thuộc góc")
     ax.set_xlabel("Góc quay")
-    ax.set_ylabel("Thời gian sau khi chỉnh")
+    ax.set_ylabel("Thời gian sau khi chỉnh (s)")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8, loc="upper left")
 
@@ -113,7 +113,7 @@ def main() -> int:
     ax.axhline(0, color="black", lw=0.8, ls="--")
     ax.set_title("Chênh lệch (sau − trước) theo góc")
     ax.set_xlabel("Góc quay")
-    ax.set_ylabel("Sau − trước")
+    ax.set_ylabel("Sau − trước (s)")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8, loc="upper right")
 
@@ -123,7 +123,7 @@ def main() -> int:
     ax.hist(before, bins=bins, alpha=0.55, color="#1f6feb", label=f"Trước (σ={before.std():.1f})")
     ax.hist(after, bins=bins, alpha=0.55, color="#e8710a", label=f"Sau (σ={after.std():.1f})")
     ax.set_title("Phân bố thời gian trước / sau")
-    ax.set_xlabel("Giá trị")
+    ax.set_xlabel("Thời gian (s)")
     ax.set_ylabel("Số mẫu")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8)
@@ -147,14 +147,14 @@ def main() -> int:
         )
     with open(args.summary, "w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["Goc quay", "So mau", "TB truoc", "TB sau", "TB sau - truoc"])
+        writer.writerow(["Goc quay", "So mau", "TB truoc (s)", "TB sau (s)", "TB sau - truoc (s)"])
         writer.writerows(rows)
     print(f"Da luu tom tat: {args.summary}")
 
     print(f"\nSo mau: {before.size}")
-    print(f"Truoc: TB={before.mean():.2f}  SD={before.std():.2f}  min={before.min():.0f}  max={before.max():.0f}")
-    print(f"Goc  : TB={angle.mean():.2f}  SD={angle.std():.2f}  min={angle.min():.0f}  max={angle.max():.0f}")
-    print(f"Sau  : TB={after.mean():.2f}  SD={after.std():.2f}  min={after.min():.0f}  max={after.max():.0f}")
+    print(f"Truoc (s): TB={before.mean():.2f}  SD={before.std():.2f}  min={before.min():.0f}  max={before.max():.0f}")
+    print(f"Goc  (do): TB={angle.mean():.2f}  SD={angle.std():.2f}  min={angle.min():.0f}  max={angle.max():.0f}")
+    print(f"Sau  (s) : TB={after.mean():.2f}  SD={after.std():.2f}  min={after.min():.0f}  max={after.max():.0f}")
     print(f"Tuong quan goc-truoc: r={r_before:.4f} (R2={r_before**2:.4f})")
     print(f"Tuong quan goc-sau  : r={r_after:.4f} (R2={r_after**2:.4f})")
     print(f"Tuong quan goc-delta: r={r_delta:.4f}")
