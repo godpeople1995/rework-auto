@@ -40,33 +40,9 @@ python -m pip install plc-comm-kv-hostlink
 ## Chạy ví dụ
 
 ```powershell
-# Đọc 10 word từ DM100 của PLC KV-8000 tại 192.168.100.200:8501
+# Đọc 10 word từ DM500 của PLC KV-8000 tại 192.168.100.200:8501
 .\.venv\Scripts\python.exe main.py --host 192.168.100.200 --port 8501 --profile keyence:kv-8000
 ```
-
-### Đọc DM500 (script riêng)
-
-```powershell
-# Mặc định: 192.168.100.200:8501, profile keyence:kv-8000
-.\.venv\Scripts\python.exe read_dm500.py
-
-# Chỉ định PLC khác
-.\.venv\Scripts\python.exe read_dm500.py --host 192.168.250.10 --port 8501
-```
-
-Kết quả in ra DM500 theo nhiều cách hiểu (cùng 1 giá trị đọc từ PLC):
-
-```
-DM500 (word tho, hex)      : 0x04D2
-DM500 (U - uint16)          : 1234
-DM500 (S - int16)            : 1234
-DM500 (bit)                  : 0000010011010010
-DM500-DM501 (D - uint32)          : 1234
-   (L - int32)  : 1234
-   (F - float32): 1.7292e-42
-```
-
-Dùng `--device DM500` cho `main.py` cũng tương đương.
 
 ### Doc ZF10000-ZF16000 theo 3 cot
 
