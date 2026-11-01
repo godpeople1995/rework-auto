@@ -62,6 +62,17 @@ Chuong trinh dung `numpy` va dung truoc khi in nhom dau tien co ca 3 gia tri ban
 
 Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
 
+### Vẽ biểu đồ và phân tích
+
+```powershell
+.\.venv\Scripts\python.exe plot_zf_values.py
+```
+
+Tạo ra:
+
+- `zf_analysis.png` — 6 biểu đồ: chuỗi thời gian trước/sau, góc quay, tương quan góc–trước, góc–sau, chênh lệch, phân bố
+- `zf_angle_summary.csv` — bảng trung bình theo từng góc quay
+
 Tham số:
 
 - `--host` IP PLC

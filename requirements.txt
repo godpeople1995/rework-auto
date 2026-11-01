@@ -1,2 +1,3 @@
 plc-comm-kv-hostlink==4.2.0
 numpy>=2.0
+matplotlib>=3.10
