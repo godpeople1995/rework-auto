@@ -46,7 +46,7 @@ python -m pip install plc-comm-kv-hostlink
 
 ### Doc ZF10000-ZF16000 theo 3 cot
 
-File `read_data_rework.py` doc moi lan mot nhom 3 word kieu `S` (int16):
+File `read_data_rework.py` doc moi lan mot nhom 3 word kieu `S` (int16). Sau khi doc xong, du lieu duoc phan loai theo tung goc quay vao thu muc `zf_by_angle/` (moi goc mot file `goc_<goc>.csv`):
 
 ```text
 ZF10000 | ZF10001 | ZF10002

@@ -106,6 +106,28 @@ async def read_zf_values(args: argparse.Namespace) -> int:
         )
     print(f"Da luu {len(rows)} dong vao {args.csv}.")
 
+    # Phan loai theo goc quay: moi goc mot file rieng
+    from pathlib import Path
+
+    group_dir = Path("zf_by_angle")
+    group_dir.mkdir(exist_ok=True)
+    for old_file in group_dir.glob("goc_*.csv"):
+        old_file.unlink()
+
+    groups: dict[int, list[list[int]]] = {}
+    for row in rows:
+        groups.setdefault(int(row[1]), []).append(
+            [int(row[0]), int(row[1]), int(row[2])]
+        )
+
+    for angle in sorted(groups):
+        group_path = group_dir / f"goc_{angle}.csv"
+        with open(group_path, "w", newline="", encoding="utf-8-sig") as group_file:
+            writer = csv.writer(group_file)
+            writer.writerow(columns)
+            writer.writerows(groups[angle])
+    print(f"Da phan loai {len(groups)} goc quay vao thu muc {group_dir}/")
+
     return 0
 
 
