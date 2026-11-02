@@ -71,6 +71,14 @@ Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
 
 ```powershell
 .\.venv\Scripts\python.exe plot_zf_by_angle.py
+
+### Cua so hien thi va cap nhat du lieu PLC
+
+```powershell
+.\.venv\Scripts\python.exe dashboard_rework.py
+```
+
+Mo 1 cua so Tkinter hien thi tat ca bieu do theo goc quay. Nhan nut "Doc & cap nhat PLC" de doc lai du lieu tu PLC va cap nhat bieu do.
 ```
 
 Tao ra thu muc `zf_angle_plots/` voi 1 anh `goc_<goc>.png` cho moi goc quay.
