@@ -79,20 +79,26 @@ class Dashboard(tk.Tk):
         self.canvas = FigureCanvasTkAgg(self.fig, master=left)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-        right = ttk.Frame(content, width=360)
+        right = ttk.Frame(content, width=420)
         right.pack(side="right", fill="y", padx=8, pady=8)
         ttk.Label(right, text="Ty le theo goc quay", font=("Segoe UI", 10, "bold")).pack(anchor="w")
 
-        columns = ("Goc", "So mau", "OK %", "Slow %", "Fast %")
-        self.tree = ttk.Treeview(right, columns=columns, show="headings", height=18)
-        for col in columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, width=72, anchor="center")
-        self.tree.pack(fill="both", expand=True)
+        table_container = tk.Frame(right)
+        table_container.pack(fill="both", expand=True)
 
-        scrollbar = ttk.Scrollbar(right, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
+        self.table_canvas = tk.Canvas(table_container, highlightthickness=0)
+        self.table_scroll = ttk.Scrollbar(table_container, orient="vertical", command=self.table_canvas.yview)
+        self.table_inner = tk.Frame(self.table_canvas)
+        self.table_inner.bind(
+            "<Configure>", lambda e: self.table_canvas.configure(scrollregion=self.table_canvas.bbox("all"))
+        )
+        self.table_canvas.create_window((0, 0), window=self.table_inner, anchor="nw")
+        self.table_canvas.configure(yscrollcommand=self.table_scroll.set)
+        self.table_canvas.pack(side="left", fill="both", expand=True)
+        self.table_scroll.pack(side="right", fill="y")
+
+        for j in range(5):
+            self.table_inner.columnconfigure(j, weight=1, minsize=78)
 
         self.canvas.draw()
 
@@ -192,15 +198,29 @@ class Dashboard(tk.Tk):
             self.metrics_var.set("OK: -  Slow: -  Fast: -")
 
         # Cap nhat bang ty le theo goc quay
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+        for child in self.table_inner.winfo_children():
+            child.destroy()
+
+        headers = ["Goc", "So mau", "OK %", "Slow %", "Fast %"]
+        for j, text in enumerate(headers):
+            tk.Label(
+                self.table_inner,
+                text=text,
+                relief="solid",
+                borderwidth=1,
+                bg="#d9d9d9",
+                font=("Segoe UI", 9, "bold"),
+            ).grid(row=0, column=j, sticky="nsew")
+
         try:
             upper = float(self.upper_var.get())
             lower = float(self.lower_var.get())
         except ValueError:
             upper = lower = None
+
         if upper is not None and lower is not None:
             files = sorted(self.angle_dir.glob("goc_*.csv")) if self.angle_dir.exists() else []
+            row_idx = 1
             for path in files:
                 try:
                     values = np.genfromtxt(path, delimiter=",", skip_header=1)
@@ -209,15 +229,30 @@ class Dashboard(tk.Tk):
                     after = values[:, 2]
                     angle_value = int(values[0, 1]) if values.size else 0
                     total = after.size
-                    if total > 0:
-                        ok = float(np.sum((after >= lower) & (after <= upper))) / total * 100.0
-                        slow = float(np.sum(after > upper)) / total * 100.0
-                        fast = float(np.sum(after < lower)) / total * 100.0
-                        self.tree.insert(
-                            "",
-                            "end",
-                            values=(angle_value, total, f"{ok:.1f}", f"{slow:.1f}", f"{fast:.1f}"),
-                        )
+                    if total <= 0:
+                        continue
+                    ok = float(np.sum((after >= lower) & (after <= upper))) / total * 100.0
+                    slow = float(np.sum(after > upper)) / total * 100.0
+                    fast = float(np.sum(after < lower)) / total * 100.0
+
+                    cells = [
+                        (str(angle_value), "#ffffff", "#000000"),
+                        (str(total), "#000000", "#ffffff"),
+                        (f"{ok:.1f}", "#2e7d32", "#ffffff"),
+                        (f"{slow:.1f}", "#7b1fa2", "#ffffff"),
+                        (f"{fast:.1f}", "#e65100", "#ffffff"),
+                    ]
+                    for j, (text, bg, fg) in enumerate(cells):
+                        tk.Label(
+                            self.table_inner,
+                            text=text,
+                            relief="solid",
+                            borderwidth=1,
+                            bg=bg,
+                            fg=fg,
+                            font=("Segoe UI", 9),
+                        ).grid(row=row_idx, column=j, sticky="nsew")
+                    row_idx += 1
                 except Exception:  # noqa: BLE001
                     continue
 
