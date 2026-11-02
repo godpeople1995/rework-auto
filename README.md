@@ -66,6 +66,14 @@ Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
 
 ```powershell
 .\.venv\Scripts\python.exe plot_zf_values.py
+
+### Ve bieu do theo tung goc quay
+
+```powershell
+.\.venv\Scripts\python.exe plot_zf_by_angle.py
+```
+
+Tao ra thu muc `zf_angle_plots/` voi 1 anh `goc_<goc>.png` cho moi goc quay.
 ```
 
 Tạo ra:
