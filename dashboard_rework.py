@@ -71,8 +71,29 @@ class Dashboard(tk.Tk):
 
         self.fig, self.axes = plt.subplots(4, 3, figsize=(14, 9))
         self.fig.tight_layout(rect=(0, 0, 1, 0.96))
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+        content = ttk.Frame(self)
+        content.pack(fill="both", expand=True)
+
+        left = ttk.Frame(content)
+        left.pack(side="left", fill="both", expand=True)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=left)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
+
+        right = ttk.Frame(content, width=360)
+        right.pack(side="right", fill="y", padx=8, pady=8)
+        ttk.Label(right, text="Ty le theo goc quay", font=("Segoe UI", 10, "bold")).pack(anchor="w")
+
+        columns = ("Goc", "So mau", "OK %", "Slow %", "Fast %")
+        self.tree = ttk.Treeview(right, columns=columns, show="headings", height=18)
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=72, anchor="center")
+        self.tree.pack(fill="both", expand=True)
+
+        scrollbar = ttk.Scrollbar(right, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
         self.canvas.draw()
 
         self.refresh_plots()
@@ -169,6 +190,36 @@ class Dashboard(tk.Tk):
                 self.metrics_var.set("OK: -  Slow: -  Fast: -")
         except Exception:  # noqa: BLE001
             self.metrics_var.set("OK: -  Slow: -  Fast: -")
+
+        # Cap nhat bang ty le theo goc quay
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        try:
+            upper = float(self.upper_var.get())
+            lower = float(self.lower_var.get())
+        except ValueError:
+            upper = lower = None
+        if upper is not None and lower is not None:
+            files = sorted(self.angle_dir.glob("goc_*.csv")) if self.angle_dir.exists() else []
+            for path in files:
+                try:
+                    values = np.genfromtxt(path, delimiter=",", skip_header=1)
+                    if values.ndim == 1:
+                        values = values.reshape(1, -1)
+                    after = values[:, 2]
+                    angle_value = int(values[0, 1]) if values.size else 0
+                    total = after.size
+                    if total > 0:
+                        ok = float(np.sum((after >= lower) & (after <= upper))) / total * 100.0
+                        slow = float(np.sum(after > upper)) / total * 100.0
+                        fast = float(np.sum(after < lower)) / total * 100.0
+                        self.tree.insert(
+                            "",
+                            "end",
+                            values=(angle_value, total, f"{ok:.1f}", f"{slow:.1f}", f"{fast:.1f}"),
+                        )
+                except Exception:  # noqa: BLE001
+                    continue
 
         self.fig.suptitle("Bieu do theo tung goc quay", fontsize=14, fontweight="bold")
         self.fig.tight_layout(rect=(0, 0, 1, 0.95))
