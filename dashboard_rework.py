@@ -52,6 +52,14 @@ class Dashboard(tk.Tk):
         self.transport_var = tk.StringVar(value="tcp")
         ttk.Combobox(top, textvariable=self.transport_var, values=["tcp", "udp"], width=7).pack(side="left", padx=4)
 
+        ttk.Label(top, text="Bien tren:").pack(side="left")
+        self.upper_var = tk.StringVar(value="140")
+        ttk.Entry(top, textvariable=self.upper_var, width=7).pack(side="left", padx=4)
+
+        ttk.Label(top, text="Bien duoi:").pack(side="left")
+        self.lower_var = tk.StringVar(value="120")
+        ttk.Entry(top, textvariable=self.lower_var, width=7).pack(side="left", padx=4)
+
         self.update_btn = ttk.Button(top, text="Doc & cap nhat PLC", command=self.start_update)
         self.update_btn.pack(side="left", padx=8)
 
@@ -65,6 +73,9 @@ class Dashboard(tk.Tk):
         self.canvas.draw()
 
         self.refresh_plots()
+
+        self.upper_var.trace_add("write", lambda *args: self.refresh_plots())
+        self.lower_var.trace_add("write", lambda *args: self.refresh_plots())
 
     def start_update(self) -> None:
         self.update_btn.config(state="disabled")
@@ -112,6 +123,22 @@ class Dashboard(tk.Tk):
             angle_value = int(angle[0]) if angle.size else 0
             ax.plot(idx, before, color="#1f6feb", lw=1.0, label="Truoc")
             ax.plot(idx, after, color="#e8710a", lw=1.0, label="Sau")
+
+            # Ve bien tren, bien duoi va bien trung tam
+            try:
+                upper = float(self.upper_var.get())
+                ax.axhline(upper, color="#d32f2f", linestyle="--", linewidth=1.2, label="Bien tren")
+            except ValueError:
+                upper = None
+            try:
+                lower = float(self.lower_var.get())
+                ax.axhline(lower, color="#d32f2f", linestyle=":", linewidth=1.2, label="Bien duoi")
+            except ValueError:
+                lower = None
+            if upper is not None and lower is not None:
+                center = (upper + lower) / 2.0
+                ax.axhline(center, color="#2e7d32", linestyle="-", linewidth=1.5, label="Bien trung tam")
+
             ax.set_title(f"Goc {angle_value} (n={before.size})", fontsize=9)
             ax.set_xlabel("Mau", fontsize=8)
             ax.set_ylabel("s", fontsize=8)
