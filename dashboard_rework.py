@@ -63,6 +63,9 @@ class Dashboard(tk.Tk):
         self.update_btn = ttk.Button(top, text="Doc & cap nhat PLC", command=self.start_update)
         self.update_btn.pack(side="left", padx=8)
 
+        self.metrics_var = tk.StringVar(value="OK: -  Slow: -  Fast: -")
+        ttk.Label(top, textvariable=self.metrics_var).pack(side="left", padx=8)
+
         self.status_var = tk.StringVar(value="San sang.")
         ttk.Label(top, textvariable=self.status_var).pack(side="left", padx=8)
 
@@ -127,12 +130,12 @@ class Dashboard(tk.Tk):
             # Ve bien tren, bien duoi va bien trung tam
             try:
                 upper = float(self.upper_var.get())
-                ax.axhline(upper, color="#d32f2f", linestyle="--", linewidth=1.2, label="Bien tren")
+                ax.axhline(upper, color="#7b1fa2", linestyle="--", linewidth=1.2, label="Bien tren")
             except ValueError:
                 upper = None
             try:
                 lower = float(self.lower_var.get())
-                ax.axhline(lower, color="#d32f2f", linestyle=":", linewidth=1.2, label="Bien duoi")
+                ax.axhline(lower, color="#e65100", linestyle=":", linewidth=1.2, label="Bien duoi")
             except ValueError:
                 lower = None
             if upper is not None and lower is not None:
@@ -144,6 +147,28 @@ class Dashboard(tk.Tk):
             ax.set_ylabel("s", fontsize=8)
             ax.grid(alpha=0.3)
             ax.tick_params(labelsize=8)
+
+        # Tinh cac chi so % dua tren bien
+        csv_path = self.base_dir / "zf_values.csv"
+        try:
+            data = np.genfromtxt(csv_path, delimiter=",", skip_header=1)
+            if data.ndim == 1:
+                data = data.reshape(1, -1)
+            after = data[:, 2]
+            upper = float(self.upper_var.get())
+            lower = float(self.lower_var.get())
+            total = after.size
+            if total > 0:
+                ok = float(np.sum((after >= lower) & (after <= upper))) / total * 100.0
+                slow = float(np.sum(after > upper)) / total * 100.0
+                fast = float(np.sum(after < lower)) / total * 100.0
+                self.metrics_var.set(
+                    f"OK (trong 2 bien): {ok:.1f}%   Slow (tren bien tren): {slow:.1f}%   Fast (duoi bien duoi): {fast:.1f}%"
+                )
+            else:
+                self.metrics_var.set("OK: -  Slow: -  Fast: -")
+        except Exception:  # noqa: BLE001
+            self.metrics_var.set("OK: -  Slow: -  Fast: -")
 
         self.fig.suptitle("Bieu do theo tung goc quay", fontsize=14, fontweight="bold")
         self.fig.tight_layout(rect=(0, 0, 1, 0.95))
