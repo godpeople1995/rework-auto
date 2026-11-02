@@ -6,7 +6,7 @@ Chay:
 
 from __future__ import annotations
 
-import subprocess
+import asyncio
 import sys
 import threading
 from pathlib import Path
@@ -22,6 +22,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 from tkinter import ttk
 
+from plc_reader import read_zf_values
+
 
 class Dashboard(tk.Tk):
     def __init__(self) -> None:
@@ -29,7 +31,10 @@ class Dashboard(tk.Tk):
         self.title("Rework Auto - Bieu do theo goc quay")
         self.geometry("1500x900")
 
-        self.base_dir = Path(__file__).resolve().parent
+        if getattr(sys, "frozen", False):
+            self.base_dir = Path(sys.executable).resolve().parent
+        else:
+            self.base_dir = Path(__file__).resolve().parent
         self.angle_dir = self.base_dir / "zf_by_angle"
 
         top = ttk.Frame(self, padding=8)
@@ -71,29 +76,12 @@ class Dashboard(tk.Tk):
         host = self.host_var.get().strip()
         port = self.port_var.get().strip()
         transport = self.transport_var.get().strip()
-        script = self.base_dir / "read_data_rework.py"
-        cmd = [
-            sys.executable,
-            str(script),
-            "--host",
-            host,
-            "--port",
-            port,
-            "--transport",
-            transport,
-        ]
+        csv_path = self.base_dir / "zf_values.csv"
         try:
-            result = subprocess.run(
-                cmd,
-                cwd=str(self.base_dir),
-                capture_output=True,
-                text=True,
-                timeout=300,
+            asyncio.run(
+                read_zf_values(host, int(port), transport, 3.0, csv_path)
             )
-            if result.returncode != 0:
-                self.after(0, lambda: self._finish_update(False, result.stderr or result.stdout))
-            else:
-                self.after(0, lambda: self._finish_update(True, "Cap nhat thanh cong."))
+            self.after(0, lambda: self._finish_update(True, "Cap nhat thanh cong."))
         except Exception as exc:  # noqa: BLE001
             self.after(0, lambda: self._finish_update(False, str(exc)))
 
