@@ -79,6 +79,8 @@ Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
 ```
 
 Mo 1 cua so Tkinter hien thi tat ca bieu do theo goc quay. Nhan nut "Doc & cap nhat PLC" de doc lai du lieu tu PLC va cap nhat bieu do.
+
+![Giao dien dashboard](docs/ui_dashboard.png)
 ```
 
 Tao ra thu muc `zf_angle_plots/` voi 1 anh `goc_<goc>.png` cho moi goc quay.
