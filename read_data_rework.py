@@ -6,8 +6,8 @@ Moi dong gom 3 cot:
 Chuong trinh dung lai khi mot nhom 3 gia tri lien ke deu bang 0.
 
 Chay:
-    .\.venv\Scripts\python.exe read_zf10000_16000.py
-    .\.venv\Scripts\python.exe read_zf10000_16000.py --host 192.168.100.200
+    .\.venv\Scripts\python.exe read_data_rework.py
+    .\.venv\Scripts\python.exe read_data_rework.py --host 192.168.100.200
 """
 
 from __future__ import annotations

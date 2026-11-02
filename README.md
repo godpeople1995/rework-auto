@@ -46,7 +46,7 @@ python -m pip install plc-comm-kv-hostlink
 
 ### Doc ZF10000-ZF16000 theo 3 cot
 
-File `read_zf10000_16000.py` doc moi lan mot nhom 3 word kieu `S` (int16):
+File `read_data_rework.py` doc moi lan mot nhom 3 word kieu `S` (int16):
 
 ```text
 ZF10000 | ZF10001 | ZF10002
@@ -57,7 +57,7 @@ ZF10003 | ZF10004 | ZF10005
 Chuong trinh dung `numpy` va dung truoc khi in nhom dau tien co ca 3 gia tri bang 0:
 
 ```powershell
-.\.venv\Scripts\python.exe read_zf10000_16000.py
+.\.venv\Scripts\python.exe read_data_rework.py
 ```
 
 Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
