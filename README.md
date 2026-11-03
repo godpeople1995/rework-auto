@@ -1,144 +1,49 @@
-# Rework Auto (Python) — KEYENCE KV Host Link
+# Rework Auto — Giao tiếp PLC KEYENCE KV (Host Link)
 
-Giao tiếp PLC KEYENCE dòng KV qua Host Link (Upper Link) bằng Python.
-
-## Thông tin thư viện
-
-| Mục | Giá trị |
-| --- | --- |
-| Tên gói trên PyPI | `plc-comm-kv-hostlink` (bản 4.2.0) |
-| Tên cũ (đã đổi tên) | `kv-hostlink` (1.2.1) — không dùng nữa |
-| Tên import trong code | `import hostlink` |
-| Yêu cầu | Python >= 3.10 |
-| Repo | https://github.com/fa-yoshinobu/plc-comm-hostlink-python |
-| Tài liệu | https://fa-yoshinobu.github.io/plc-comm-docs-site/hostlink/python/GETTING_STARTED/ |
+Đọc dữ liệu ZF10000–ZF16000 từ PLC KEYENCE KV qua Host Link (Upper Link), vẽ biểu đồ và hiển thị dashboard.
 
 ## Cài đặt
 
-Môi trường ảo đã được tạo sẵn trong `.venv`:
-
 ```powershell
-# Kích hoạt môi trường (PowerShell)
 .\.venv\Scripts\Activate.ps1
-
-# Cài lại / cập nhật thư viện
 python -m pip install -r requirements.txt
 ```
 
-Cài toàn cục (không khuyến nghị):
+Thư viện: [`plc-comm-kv-hostlink`](https://pypi.org/project/plc-comm-kv-hostlink/) (import name `hostlink`), Python >= 3.10.
+
+## Chạy
 
 ```powershell
-python -m pip install plc-comm-kv-hostlink
-```
-
-## Kiểm tra nhanh
-
-```powershell
-.\.venv\Scripts\python.exe -c "import hostlink; print(hostlink.__version__)"
-```
-
-## Chạy ví dụ
-
-```powershell
-# Đọc 10 word từ DM500 của PLC KV-8000 tại 192.168.100.200:8501
-.\.venv\Scripts\python.exe main.py --host 192.168.100.200 --port 8501 --profile keyence:kv-8000
-```
-
-### Doc ZF10000-ZF16000 theo 3 cot
-
-File `read_data_rework.py` doc moi lan mot nhom 3 word kieu `S` (int16). Sau khi doc xong, du lieu duoc phan loai theo tung goc quay vao thu muc `zf_by_angle/` (moi goc mot file `goc_<goc>.csv`):
-
-```text
-ZF10000 | ZF10001 | ZF10002
-ZF10003 | ZF10004 | ZF10005
-...
-```
-
-Chuong trinh dung `numpy` va dung truoc khi in nhom dau tien co ca 3 gia tri bang 0:
-
-```powershell
+# Đọc dữ liệu ZF, lưu zf_values.csv + phân loại theo góc vào zf_by_angle/
 .\.venv\Scripts\python.exe read_data_rework.py
-```
 
-Dia chi mac dinh la `192.168.100.200:8501`, PLC profile `keyence:kv-8000`.
+# Vẽ biểu đồ
+.\.venv\Scripts\python.exe plot.py values     # 6-panel phân tích tổng
+.\.venv\Scripts\python.exe plot.py angles     # vẽ từng góc quay riêng
 
-### Vẽ biểu đồ và phân tích
-
-```powershell
-.\.venv\Scripts\python.exe plot_zf_values.py
-
-### Ve bieu do theo tung goc quay
-
-```powershell
-.\.venv\Scripts\python.exe plot_zf_by_angle.py
-
-### Cua so hien thi va cap nhat du lieu PLC
-
-```powershell
+# Dashboard Tkinter (nút "Đọc & cập nhật PLC")
 .\.venv\Scripts\python.exe dashboard_rework.py
 ```
 
-Mo 1 cua so Tkinter hien thi tat ca bieu do theo goc quay. Nhan nut "Doc & cap nhat PLC" de doc lai du lieu tu PLC va cap nhat bieu do.
+Địa chỉ PLC mặc định `192.168.100.200:8501`, profile `keyence:kv-8000`. Xem thêm tùy chọn bằng `--help`.
 
-![Giao dien dashboard](docs/ui_dashboard.png)
-```
-
-Tao ra thu muc `zf_angle_plots/` voi 1 anh `goc_<goc>.png` cho moi goc quay.
-```
-
-Tạo ra:
-
-- `zf_analysis.png` — 6 biểu đồ: chuỗi thời gian trước/sau, góc quay, tương quan góc–trước, góc–sau, chênh lệch, phân bố
-- `zf_angle_summary.csv` — bảng trung bình theo từng góc quay
-
-Đơn vị: 2 cột thời gian tính bằng **giây (s)**, góc quay tính bằng **độ (°)**.
-
-Tham số:
-
-- `--host` IP PLC
-- `--port` cổng Host Link (mặc định `8501`)
-- `--transport` `tcp` hoặc `udp`
-- `--profile` profile PLC: `keyence:kv-nano`, `keyence:kv-3000`, `keyence:kv-5000`, `keyence:kv-7000`, `keyence:kv-8000`, `keyence:kv-x500` (thêm hậu tố `-xym` nếu dùng thiết bị X/Y/M)
-- `--device`, `--count` địa chỉ bắt đầu và số word cần đọc
-
-## Đoạn code tối thiểu
-
-```python
-import asyncio
-import hostlink as hl
-
-async def main() -> None:
-    options = hl.HostLinkConnectionOptions(
-        "192.168.100.200",
-        port=8501,
-        transport="tcp",
-        plc_profile="keyence:kv-8000",
-    )
-    client = await hl.open_and_connect(options)
-    async with client:
-        words = await hl.read_words_single_request(client, "DM100", 10)
-        print(words)
-
-        await hl.write_words_single_request(client, "DM300", [1234])
-        value = await hl.read_typed(client, "DM200", "D")  # uint32
-        print(value)
-
-asyncio.run(main())
-```
-
-## Kiểu dữ liệu cho `read_typed` / `write_typed`
-
-| Mã | Ý nghĩa |
+| Script | Kết quả |
 | --- | --- |
-| `U` | unsigned 16-bit |
-| `S` | signed 16-bit |
-| `D` | unsigned 32-bit |
-| `L` | signed 32-bit |
-| `F` | float32 |
-| `H` | hex 16-bit (chuỗi) |
+| `read_data_rework.py` | `zf_values.csv`, `zf_by_angle/goc_*.csv` |
+| `plot.py values` | `zf_analysis.png`, `zf_angle_summary.csv` |
+| `plot.py angles` | `zf_angle_plots/goc_*.png` |
+| `dashboard_rework.py` | Cửa sổ GUI cập nhật trực tiếp |
+
+## Cấu trúc
+
+- `plc_reader.py` — lõi: đọc PLC + lưu CSV + phân loại theo góc
+- `common.py` — tiện ích dùng chung (`load_data`, màu, font)
+- `read_data_rework.py` — CLI đọc dữ liệu
+- `plot.py` — vẽ biểu đồ (2 chế độ)
+- `dashboard_rework.py` — GUI Tkinter
+- `main.py` — ví dụ đọc/ghi PLC tối thiểu
 
 ## Ghi chú
 
-- Địa chỉ dùng dạng `DM100`, `EM100`, `MR100`, `X0`, `Y0`... (không ghép kiểu như `DM100.D` khi dùng helper).
-- Cần bật Host Link (Upper Link) trên PLC và mở đúng cổng/port tương ứng.
-- File `.vscode/settings.json` đã trỏ interpreter về `.venv` để VS Code tự nhận môi trường.
+- Cần bật Host Link (Upper Link) trên PLC và mở đúng cổng/port.
+- Dữ liệu CSV/ảnh sinh ra khi chạy không được đưa lên Git (xem `.gitignore`).

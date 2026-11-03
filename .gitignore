@@ -7,5 +7,12 @@ __pycache__/
 .ruff_cache/
 
 build/
+dist/
 *.spec
 
+# Dữ liệu và kết quả sinh ra tự động khi chạy
+zf_values.csv
+zf_by_angle/
+zf_angle_plots/
+zf_analysis.png
+zf_angle_summary.csv
