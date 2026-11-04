@@ -151,7 +151,8 @@ class Dashboard(tk.Tk):
             )
             self.after(0, lambda: self._finish_update(True, "Cập nhật thành công."))
         except Exception as exc:  # noqa: BLE001
-            self.after(0, lambda: self._finish_update(False, str(exc)))
+            message = str(exc)
+            self.after(0, lambda: self._finish_update(False, message))
 
     def _finish_update(self, ok: bool, message: str) -> None:
         self.update_btn.config(state="normal")
