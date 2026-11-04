@@ -9,7 +9,12 @@ from __future__ import annotations
 
 import argparse
 import csv
+import sys
 from pathlib import Path
+
+# Đảm bảo in được tiếng Việt có dấu trên console Windows (tránh UnicodeEncodeError)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import matplotlib
 
@@ -48,7 +53,7 @@ def plot_values(args: argparse.Namespace) -> int:
 
     # (1) Chuỗi thời gian
     ax = axes[0, 0]
-    ax.plot(idx, before, color=COL_BEFORE, lw=0.6, alpha=0.35)
+    ax.plot(idx, before, color=COL_BEFORE, lw=0.6, alpha=0.35, label="Từng mẫu")
     ax.plot(idx, after, color=COL_AFTER, lw=0.6, alpha=0.35)
     if before.size >= 51:
         kernel = np.ones(51) / 51
