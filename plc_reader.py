@@ -22,8 +22,10 @@ async def read_zf_values(
     transport: str,
     timeout: float,
     csv_path: str | Path,
+    start: int = START,
+    end: int = END,
 ) -> list[list[int]]:
-    """Doc ZF10000-ZF16000, luu CSV va phan loai theo goc. Tra ve danh sach dong."""
+    """Doc ZF<start>-ZF<end>, luu CSV va phan loai theo goc. Tra ve danh sach dong."""
     options = hl.HostLinkConnectionOptions(
         host,
         port=port,
@@ -36,7 +38,7 @@ async def read_zf_values(
     rows: list[list[int]] = []
     try:
         async with client:
-            for base in range(START, END + 1, GROUP_SIZE):
+            for base in range(start, end + 1, GROUP_SIZE):
                 values = await client.read_consecutive(
                     f"ZF{base}", GROUP_SIZE, data_format=".S"
                 )

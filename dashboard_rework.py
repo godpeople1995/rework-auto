@@ -74,6 +74,8 @@ class Dashboard(tk.Tk):
         self.host_var = tk.StringVar(value="192.168.100.200")
         self.port_var = tk.StringVar(value="8501")
         self.transport_var = tk.StringVar(value="tcp")
+        self.start_var = tk.StringVar(value="10000")
+        self.end_var = tk.StringVar(value="16000")
         self.upper_var = tk.StringVar(value="140")
         self.lower_var = tk.StringVar(value="120")
         self.metrics_var = tk.StringVar(value="OK: -  Slow: -  Fast: -")
@@ -85,6 +87,10 @@ class Dashboard(tk.Tk):
         ttk.Entry(top, textvariable=self.port_var, width=8).pack(side="left", padx=4)
         ttk.Label(top, text="Transport:").pack(side="left")
         ttk.Combobox(top, textvariable=self.transport_var, values=["tcp", "udp"], width=7).pack(side="left", padx=4)
+        ttk.Label(top, text="ZF từ:").pack(side="left")
+        ttk.Entry(top, textvariable=self.start_var, width=7).pack(side="left", padx=4)
+        ttk.Label(top, text="ZF đến:").pack(side="left")
+        ttk.Entry(top, textvariable=self.end_var, width=7).pack(side="left", padx=4)
         ttk.Label(top, text="Biên trên:").pack(side="left")
         ttk.Entry(top, textvariable=self.upper_var, width=7).pack(side="left", padx=4)
         ttk.Label(top, text="Biên dưới:").pack(side="left")
@@ -140,6 +146,7 @@ class Dashboard(tk.Tk):
                 read_zf_values(
                     self.host_var.get().strip(), int(self.port_var.get().strip()),
                     self.transport_var.get().strip(), 3.0, self.base_dir / "zf_values.csv",
+                    start=int(self.start_var.get()), end=int(self.end_var.get()),
                 )
             )
             self.after(0, lambda: self._finish_update(True, "Cập nhật thành công."))

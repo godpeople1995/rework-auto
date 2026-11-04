@@ -25,7 +25,13 @@ Thư viện: [`plc-comm-kv-hostlink`](https://pypi.org/project/plc-comm-kv-hostl
 .\.venv\Scripts\python.exe dashboard_rework.py
 ```
 
-Địa chỉ PLC mặc định `192.168.100.200:8501`, profile `keyence:kv-8000`. Xem thêm tùy chọn bằng `--help`.
+Địa chỉ PLC mặc định `192.168.100.200:8501`, profile `keyence:kv-8000`. Khoảng đọc mặc định `ZF10000`–`ZF16000`, có thể đổi bằng `--start`/`--end`:
+
+```powershell
+.\.venv\Scripts\python.exe read_data_rework.py --start 10000 --end 16000
+```
+
+Xem thêm tùy chọn bằng `--help`. Trong dashboard, nhập khoảng đọc vào ô **"ZF từ"** / **"ZF đến"**.
 
 | Script | Kết quả |
 | --- | --- |
